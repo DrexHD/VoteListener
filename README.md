@@ -6,7 +6,7 @@ first, by following their [Setup Guide](https://github.com/NuVotifier/NuVotifier
 
 ## Config
 The config file is located in `./config/votelistener.json`.
-```json
+```json5
 {
   // Special characters used in commands need to be escaped. Use a website like 
   // https://www.freeformatter.com/json-escape.html to escape your commands
