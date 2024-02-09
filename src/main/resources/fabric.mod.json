@@ -1,0 +1,26 @@
+{
+	"schemaVersion": 1,
+	"id": "votelistener",
+	"version": "${version}",
+	"name": "VoteListener",
+	"description": "A vote listener for fabric using NuVotifier-Fabric",
+	"authors": [
+		"Drex"
+	],
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"server": [
+			"me.drex.votelistener.VoteListener"
+		]
+	},
+	"mixins": [
+		"votelistener.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.6",
+		"java": ">=17",
+		"nuvotifier-fabric": "*",
+		"fabric-api": "*"
+	}
+}
