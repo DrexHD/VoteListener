@@ -99,7 +99,7 @@ public class VoteListener implements DedicatedServerModInitializer {
             try {
                 CompoundTag compoundTag = NbtIo.readCompressed(path, NbtAccounter.unlimitedHeap());
                 DataResult<VoteData> dataResult = VoteData.CODEC.parse(NbtOps.INSTANCE, compoundTag);
-                voteData = dataResult.getOrThrow(false, (error) -> LOGGER.error("Failed to load vote data: {}", error));
+                voteData = dataResult.getOrThrow(RuntimeException::new);
             } catch (IOException e) {
                 // Fail-fast
                 throw new RuntimeException(e);
