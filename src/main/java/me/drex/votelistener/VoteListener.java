@@ -55,6 +55,7 @@ public class VoteListener implements DedicatedServerModInitializer {
             loadData(server);
             VoteListener.server = server;
         });
+        ServerLifecycleEvents.AFTER_SAVE.register((server, flush, force) -> saveData(server));
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> Commands.register(dispatcher));
         ServerTickEvents.START_SERVER_TICK.register(VoteListener::onTick);
         com.vexsoftware.votifier.fabric.event.VoteListener.EVENT.register(VoteListener::onVote);

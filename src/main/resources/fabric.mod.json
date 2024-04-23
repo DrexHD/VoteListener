@@ -14,12 +14,9 @@
 			"me.drex.votelistener.VoteListener"
 		]
 	},
-	"mixins": [
-		"votelistener.mixins.json"
-	],
 	"depends": {
-		"fabricloader": ">=0.15.6",
-		"java": ">=17",
+		"fabricloader": ">=0.15.10",
+		"java": ">=21",
 		"nuvotifier-fabric": "*",
 		"fabric-api": "*"
 	}
