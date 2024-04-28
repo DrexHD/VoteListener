@@ -65,10 +65,12 @@ public class VoteListener implements DedicatedServerModInitializer {
     private static void onVote(Vote vote) {
         GameProfileCache profileCache = server.getProfileCache();
         assert profileCache != null;
-        profileCache.getAsync(vote.getUsername()).thenAcceptAsync(optional -> optional.ifPresentOrElse(
-            profile -> server.submit(() -> onVote(vote, profile)),
-            () -> LOGGER.info("Unknown player name \"{}\", discarding vote.", vote.getUsername())
-        ), server);
+        profileCache.getAsync(vote.getUsername(), optional -> {
+            optional.ifPresentOrElse(
+                profile -> server.submit(() -> onVote(vote, profile)),
+                () -> LOGGER.info("Unknown player name \"{}\", discarding vote.", vote.getUsername())
+            );
+        });
     }
 
     private static void onVote(Vote vote, GameProfile profile) {
@@ -97,7 +99,7 @@ public class VoteListener implements DedicatedServerModInitializer {
         Path path = server.getWorldPath(LevelResource.ROOT).resolve("votes.dat");
         if (Files.exists(path)) {
             try {
-                CompoundTag compoundTag = NbtIo.readCompressed(path, NbtAccounter.unlimitedHeap());
+                CompoundTag compoundTag = NbtIo.readCompressed(path.toFile());
                 DataResult<VoteData> dataResult = VoteData.CODEC.parse(NbtOps.INSTANCE, compoundTag);
                 voteData = dataResult.getOrThrow(false, (error) -> LOGGER.error("Failed to load vote data: {}", error));
             } catch (IOException e) {
@@ -115,7 +117,7 @@ public class VoteListener implements DedicatedServerModInitializer {
         Optional<Tag> optional = dataResult.resultOrPartial(error -> LOGGER.error("Failed to encode vote data, data will get lost: {}", error));
         optional.ifPresent(tag -> {
             try {
-                NbtIo.writeCompressed((CompoundTag) tag, path);
+                NbtIo.writeCompressed((CompoundTag) tag, path.toFile());
             } catch (IOException e) {
                 LOGGER.error("Failed to save vote data, data will get lost", e);
             }
