@@ -11,7 +11,7 @@ import static me.drex.votelistener.VoteListener.MOD_ID;
 
 public class VotePlaceholders {
 
-    private static final ResourceLocation VOTE_COUNT = new ResourceLocation(MOD_ID, "vote_count");
+    private static final ResourceLocation VOTE_COUNT = ResourceLocation.fromNamespaceAndPath(MOD_ID, "vote_count");
 
     public static void register() {
         Placeholders.register(VOTE_COUNT, (context, argument) -> {
