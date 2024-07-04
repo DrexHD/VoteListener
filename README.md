@@ -22,12 +22,23 @@ The config file is located in `./config/votelistener.json`.
   "commands": [
     "tellraw @a [{\"text\":\"${username}\",\"color\":\"blue\"},{\"text\":\" voted on \",\"color\":\"aqua\"},{\"text\":\"${serviceName}\",\"color\":\"blue\"}]"
   ],
-  // A list of commands that gets executed when the player that voted joins 
+  // A list of commands that gets executed when the player that voted is online or when they join
   // The commands will be executed by the player, as if they were OP
   // You can use @s to target the player (in commands that support entity selectors)
   "onlineCommands": [
     "give @s diamond 1"
-  ]
+  ],
+  // A map of vote count milestones to commands
+  // The commands work like onlineCommands, but are only executed once for each milestone
+  "milestones": {
+    // After 5 votes the player receives 5 apples
+    "5": [
+      "give @s apple 5"
+    ],
+    "10": [
+      "give @s golden_apple 2"
+    ]
+  }
 }
 ```
 

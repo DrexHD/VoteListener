@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 public class VoteListener implements DedicatedServerModInitializer {
@@ -86,12 +87,23 @@ public class VoteListener implements DedicatedServerModInitializer {
             if (playerVoteData != null) {
                 for (Vote vote : playerVoteData.unprocessedVotes()) {
                     for (String command : ConfigManager.CONFIG.onlineCommands) {
-                        server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withEntity(player).withSuppressedOutput(), formatCommand(vote, player.getGameProfile(), command));
+                        performCommand(server, player, vote, command);
+                    }
+                    int voteCount = playerVoteData.votes().indexOf(vote) + 1;
+                    List<String> milestoneCommands = ConfigManager.CONFIG.milestones.get(voteCount);
+                    if (milestoneCommands != null) {
+                        for (String command : milestoneCommands) {
+                            performCommand(server, player, vote, command);
+                        }
                     }
                 }
                 playerVoteData.unprocessedVotes().clear();
             }
         }
+    }
+
+    private static void performCommand(MinecraftServer server, ServerPlayer player, Vote vote, String command) {
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withEntity(player).withSuppressedOutput(), formatCommand(vote, player.getGameProfile(), command));
     }
 
     private static void loadData(MinecraftServer server) {
