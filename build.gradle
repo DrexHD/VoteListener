@@ -1,9 +1,13 @@
+import org.jetbrains.changelog.Changelog
+
 plugins {
 	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
+	id "me.modmuss50.mod-publish-plugin" version "0.5.1"
+	id 'org.jetbrains.changelog' version '2.+'
 }
 
-version = project.mod_version
+version = project.mod_version + "+" + project.minecraft_version
 group = project.maven_group
 
 base {
@@ -60,6 +64,42 @@ jar {
 		rename { "${it}_${project.base.archivesName.get()}"}
 	}
 }
+
+
+publishMods {
+	file = remapJar.archiveFile
+	type = STABLE
+	changelog = fetchChangelog()
+
+	displayName = "VoteListener ${version.get()}"
+	modLoaders.add("fabric")
+	modLoaders.add("quilt")
+
+	modrinth {
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		projectId = "Rl1FP1ar"
+		minecraftVersions.add(project.minecraft_version)
+	}
+	github {
+		accessToken = providers.environmentVariable("GITHUB_TOKEN")
+		repository = providers.environmentVariable("GITHUB_REPOSITORY").getOrElse("DrexHD/dryrun")
+		commitish = providers.environmentVariable("GITHUB_REF_NAME").getOrElse("dryrun")
+	}
+}
+
+
+private String fetchChangelog() {
+	def log = getChangelog.changelog.get()
+	if (log.has(project.mod_version)) {
+		return log.renderItem(
+				log.get(project.mod_version).withHeader(false),
+				Changelog.OutputType.MARKDOWN
+		)
+	} else {
+		return ""
+	}
+}
+
 
 // configure the maven publication
 publishing {
