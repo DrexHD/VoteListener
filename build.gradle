@@ -30,7 +30,7 @@ dependencies {
 
 	// NuVotifier
 	implementation("com.github.NuVotifier.NuVotifier:nuvotifier-api:${project.nuvotifier_version}")
-	implementation("com.github.DrexHD:NuVotifier-Fabric:${project.nuvotifier_fabric_version}")
+	implementation("maven.modrinth:nuvotifier-fabric:${project.nuvotifier_fabric_version}")
 
 	modImplementation(include("eu.pb4:placeholder-api:${project.placeholder_api_version}"))
 	modImplementation(include("me.lucko:fabric-permissions-api:${project.fabric_permission_api_version}"))
