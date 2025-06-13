@@ -29,7 +29,10 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// NuVotifier
-	implementation("maven.modrinth:nuvotifier-fabric:${project.nuvotifier_fabric_version}")
+	modImplementation("maven.modrinth:nuvotifier-fabric:${project.nuvotifier_fabric_version}")
+	implementation("com.github.NuVotifier.NuVotifier:nuvotifier-api:${project.nuvotifier_version}")
+	runtimeOnly("com.github.NuVotifier.NuVotifier:nuvotifier-common:${project.nuvotifier_version}")
+	runtimeOnly("org.yaml:snakeyaml:2.0")
 
 	modImplementation(include("eu.pb4:placeholder-api:${project.placeholder_api_version}"))
 	modImplementation(include("me.lucko:fabric-permissions-api:${project.fabric_permission_api_version}"))
