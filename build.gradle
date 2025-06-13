@@ -29,7 +29,6 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// NuVotifier
-	implementation("com.github.NuVotifier.NuVotifier:nuvotifier-api:${project.nuvotifier_version}")
 	implementation("maven.modrinth:nuvotifier-fabric:${project.nuvotifier_fabric_version}")
 
 	modImplementation(include("eu.pb4:placeholder-api:${project.placeholder_api_version}"))
