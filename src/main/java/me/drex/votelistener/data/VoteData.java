@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.vexsoftware.votifier.model.Vote;
 import me.drex.votelistener.VoteListener;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.server.players.NameAndId;
 
 import java.time.Duration;
 import java.util.*;
@@ -27,8 +28,8 @@ public final class VoteData {
         this.votesByTime.sort(TIME_COMPARATOR);
     }
 
-    public void onVote(Vote vote, GameProfile profile) {
-        PlayerVoteData playerVoteData = players.computeIfAbsent(profile.getId(), (profile_) -> new PlayerVoteData(new LinkedList<>(), new LinkedList<>()));
+    public void onVote(Vote vote, NameAndId nameAndId) {
+        PlayerVoteData playerVoteData = players.computeIfAbsent(nameAndId.id(), (uuid) -> new PlayerVoteData(new LinkedList<>(), new LinkedList<>()));
         playerVoteData.onVote(vote);
         this.votesByTime.add(vote);
     }

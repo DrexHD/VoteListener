@@ -1,6 +1,5 @@
 package me.drex.votelistener;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -16,10 +15,12 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.Util;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.server.players.UserNameToIdResolver;
 import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,18 +66,21 @@ public class VoteListener implements DedicatedServerModInitializer {
 
 
     private static void onVote(Vote vote) {
-        GameProfileCache profileCache = server.getProfileCache();
-        assert profileCache != null;
-        profileCache.getAsync(vote.getUsername()).thenAcceptAsync(optional -> optional.ifPresentOrElse(
-            profile -> server.submit(() -> onVote(vote, profile)),
-            () -> LOGGER.info("Unknown player name \"{}\", discarding vote.", vote.getUsername())
-        ), server);
+        UserNameToIdResolver userNameToIdResolver = server.services().nameToIdCache();
+        Util.nonCriticalIoPool().execute(() -> {
+            Optional<NameAndId> optional = userNameToIdResolver.get(vote.getUsername());
+            optional.ifPresentOrElse(
+                nameAndId -> server.submit(() -> onVote(vote, nameAndId)),
+                () -> LOGGER.info("Unknown player name \"{}\", discarding vote.", vote.getUsername())
+            );
+        });
+
     }
 
-    private static void onVote(Vote vote, GameProfile profile) {
-        voteData.onVote(vote, profile);
+    private static void onVote(Vote vote, NameAndId nameAndId) {
+        voteData.onVote(vote, nameAndId);
         for (String command : ConfigManager.CONFIG.commands) {
-            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), formatCommand(vote, profile, command));
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), formatCommand(vote, nameAndId, command));
         }
     }
 
@@ -103,7 +107,7 @@ public class VoteListener implements DedicatedServerModInitializer {
     }
 
     private static void performCommand(MinecraftServer server, ServerPlayer player, Vote vote, String command) {
-        server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withEntity(player).withSuppressedOutput(), formatCommand(vote, player.getGameProfile(), command));
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withEntity(player).withSuppressedOutput(), formatCommand(vote, player.nameAndId(), command));
     }
 
     private static void loadData(MinecraftServer server) {
@@ -135,10 +139,10 @@ public class VoteListener implements DedicatedServerModInitializer {
         });
     }
 
-    private static String formatCommand(Vote vote, GameProfile profile, String command) {
+    private static String formatCommand(Vote vote, NameAndId nameAndId, String command) {
         return command
-            .replace("${uuid}", profile.getId().toString())
-            .replace("${username}", profile.getName())
+            .replace("${uuid}", nameAndId.id().toString())
+            .replace("${username}", nameAndId.name())
             .replace("${serviceName}", vote.getServiceName())
             .replace("${address}", vote.getAddress())
             .replace("${timeStamp}", vote.getTimeStamp());
