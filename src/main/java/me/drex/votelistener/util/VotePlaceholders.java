@@ -4,14 +4,14 @@ import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
 import me.drex.votelistener.VoteListener;
 import me.drex.votelistener.data.PlayerVoteData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 import static me.drex.votelistener.VoteListener.MOD_ID;
 
 public class VotePlaceholders {
 
-    private static final ResourceLocation VOTE_COUNT = ResourceLocation.fromNamespaceAndPath(MOD_ID, "vote_count");
+    private static final Identifier VOTE_COUNT = Identifier.fromNamespaceAndPath(MOD_ID, "vote_count");
 
     public static void register() {
         Placeholders.register(VOTE_COUNT, (context, argument) -> {
