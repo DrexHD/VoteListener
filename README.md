@@ -38,7 +38,10 @@ The config file is located in `./config/votelistener.json`.
     "10": [
       "give @s golden_apple 2"
     ]
-  }
+  },
+  // If true, votes from players that are not in the user cache (1000 most recently joined players) will be ignored
+  // This is useful if a voting website is forwarding botted votes to your server
+  "ignoreUnknown": false
 }
 ```
 

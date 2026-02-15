@@ -14,7 +14,7 @@ public class Commands {
         dispatcher.register(
             literal("votelistener").requires(Permissions.require("votelistener.reload", 2)).then(
                 literal("reload").executes(context -> {
-                    if (ConfigManager.loadConfig()) {
+                    if (ConfigManager.load()) {
                         context.getSource().sendSuccess(() -> Component.literal("Config reloaded successfully!"), false);
                     } else {
                         context.getSource().sendFailure(Component.literal("Failed to reload config, check console for further information!"));

@@ -8,6 +8,7 @@ import me.drex.votelistener.command.Commands;
 import me.drex.votelistener.config.ConfigManager;
 import me.drex.votelistener.data.PlayerVoteData;
 import me.drex.votelistener.data.VoteData;
+import me.drex.votelistener.duck.ICachedUserNameToIdResolver;
 import me.drex.votelistener.util.VotePlaceholders;
 import me.drex.vanish.api.VanishAPI;
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -50,7 +51,7 @@ public class VoteListener implements DedicatedServerModInitializer {
 
     @Override
     public void onInitializeServer() {
-        if (!ConfigManager.loadConfig()) {
+        if (!ConfigManager.load()) {
             throw new IllegalStateException("Failed to load config, please fix your config file!");
         }
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
@@ -68,6 +69,13 @@ public class VoteListener implements DedicatedServerModInitializer {
     private static void onVote(Vote vote) {
         UserNameToIdResolver userNameToIdResolver = server.services().nameToIdCache();
         Util.nonCriticalIoPool().execute(() -> {
+            if (ConfigManager.config.ignoreUnknown) {
+                boolean isCached = ((ICachedUserNameToIdResolver) userNameToIdResolver).voteListener$isCached(vote.getUsername());
+                if (!isCached) {
+                    LOGGER.info("Player name is not in user cache \"{}\", discarding vote.", vote.getUsername());
+                    return;
+                }
+            }
             Optional<NameAndId> optional = userNameToIdResolver.get(vote.getUsername());
             optional.ifPresentOrElse(
                 nameAndId -> server.submit(() -> onVote(vote, nameAndId)),
@@ -79,7 +87,7 @@ public class VoteListener implements DedicatedServerModInitializer {
 
     private static void onVote(Vote vote, NameAndId nameAndId) {
         voteData.onVote(vote, nameAndId);
-        for (String command : ConfigManager.CONFIG.commands) {
+        for (String command : ConfigManager.config.commands) {
             server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), formatCommand(vote, nameAndId, command));
         }
     }
@@ -90,11 +98,11 @@ public class VoteListener implements DedicatedServerModInitializer {
             PlayerVoteData playerVoteData = voteData.players().get(player.getUUID());
             if (playerVoteData != null) {
                 for (Vote vote : playerVoteData.unprocessedVotes()) {
-                    for (String command : ConfigManager.CONFIG.onlineCommands) {
+                    for (String command : ConfigManager.config.onlineCommands) {
                         performCommand(server, player, vote, command);
                     }
                     int voteCount = playerVoteData.votes().indexOf(vote) + 1;
-                    List<String> milestoneCommands = ConfigManager.CONFIG.milestones.get(voteCount);
+                    List<String> milestoneCommands = ConfigManager.config.milestones.get(voteCount);
                     if (milestoneCommands != null) {
                         for (String command : milestoneCommands) {
                             performCommand(server, player, vote, command);

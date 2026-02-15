@@ -24,4 +24,6 @@ public class Config {
         }});
     }};
 
+    public boolean ignoreUnknown = false;
+
 }

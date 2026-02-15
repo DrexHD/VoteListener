@@ -2,43 +2,45 @@ package me.drex.votelistener.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import me.drex.votelistener.VoteListener;
+import com.google.gson.JsonSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static me.drex.votelistener.VoteListener.MOD_ID;
+import static me.drex.votelistener.VoteListener.LOGGER;
 
 public class ConfigManager {
 
-    public static Config CONFIG = null;
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().setLenient().create();
+    private static final Path CONFIG_FILE = FabricLoader.getInstance().getConfigDir().resolve("votelistener.json");
+    public static Config config = new Config();
 
-    public static boolean loadConfig() {
-        Path configDir = FabricLoader.getInstance().getConfigDir();
-        Path configFilePath = configDir.resolve("%s.json".formatted(MOD_ID));
-        if (Files.notExists(configFilePath)) {
-            CONFIG = new Config();
-            String json = GSON.toJson(CONFIG);
+    public static boolean load() {
+        LOGGER.info("Loading votelistener config");
+        if (Files.exists(CONFIG_FILE)) {
             try {
-                Files.writeString(configFilePath, json);
+                String data = Files.readString(CONFIG_FILE);
+                try {
+                    config = GSON.fromJson(data, Config.class);
+                    Files.writeString(CONFIG_FILE, GSON.toJson(config));
+                    return true;
+                } catch (JsonSyntaxException e) {
+                    LOGGER.error("Failed to parse votelistener config", e);
+                }
+            } catch (IOException e) {
+                LOGGER.error("Failed to load votelistener config", e);
+            }
+        } else {
+            try {
+                Files.writeString(CONFIG_FILE, GSON.toJson(config));
                 return true;
             } catch (IOException e) {
-                VoteListener.LOGGER.error("Failed to write default config...", e);
-                return false;
+                LOGGER.error("Failed to save votelistener config", e);
             }
         }
-        try {
-            CONFIG = GSON.fromJson(Files.readString(configFilePath), Config.class);
-            return true;
-        } catch (IOException e) {
-            VoteListener.LOGGER.error("Failed to load config, using default options", e);
-            CONFIG = new Config();
-            return false;
-        }
+        return false;
     }
-
 
 }

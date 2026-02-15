@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "me.drex.votelistener.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"CachedUserNameToIdResolverAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
