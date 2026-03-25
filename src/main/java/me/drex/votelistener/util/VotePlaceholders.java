@@ -14,8 +14,8 @@ public class VotePlaceholders {
     private static final Identifier VOTE_COUNT = Identifier.fromNamespaceAndPath(MOD_ID, "vote_count");
 
     public static void register() {
-        Placeholders.register(VOTE_COUNT, (context, argument) -> {
-            ServerPlayer player = context.player();
+        Placeholders.registerServer(VOTE_COUNT, (context, argument) -> {
+            ServerPlayer player = context.serverPlayer();
             if (player != null) {
                 PlayerVoteData playerVoteData = VoteListener.voteData.players().get(player.getUUID());
                 int count = 0;
