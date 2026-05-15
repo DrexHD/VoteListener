@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-05-15
+### Added
+- Support for ISO-8601 timestamps
+
 ## [1.1.1] - 2026-02-15
 ### Added
 - Option to ignore unknown player votes

@@ -1,14 +1,13 @@
 package me.drex.votelistener.data;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.vexsoftware.votifier.model.Vote;
-import me.drex.votelistener.VoteListener;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.players.NameAndId;
 
-import java.time.Duration;
+import java.time.DateTimeException;
+import java.time.Instant;
 import java.util.*;
 
 public final class VoteData {
@@ -60,17 +59,17 @@ public final class VoteData {
         return votesByTime.subList(low, votesByTime.size());
     }
 
-    public List<Vote> votesByTime(Duration duration) {
-        return binarySearchVotesByTime(this.votesByTime, duration.toMillis());
-    }
-
     public static long getTimeStamp(Vote vote) {
         String timeStamp = vote.getTimeStamp();
         try {
             return Long.parseLong(timeStamp);
         } catch (NumberFormatException e) {
-            VoteListener.LOGGER.error("Failed to convert vote timestamp", e);
-            return 0L;
+            try {
+                Instant instant = Instant.parse(timeStamp);
+                return instant.toEpochMilli();
+            } catch (DateTimeException ignored) {
+                return 0L;
+            }
         }
     }
 

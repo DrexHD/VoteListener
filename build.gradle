@@ -80,6 +80,7 @@ publishMods {
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		projectId = "Rl1FP1ar"
 		minecraftVersions.add(project.minecraft_version)
+		requires("nuvotifier-fabric")
 	}
 	github {
 		accessToken = providers.environmentVariable("GITHUB_TOKEN")
